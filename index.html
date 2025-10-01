@@ -1,53 +1,54 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Now Serving</title>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
   <style>
-    body { background: black; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; flex-direction: column; font-family: sans-serif; }
-    h1 { font-size: 60px; margin: 20px 0; }
-    p { font-size: 120px; margin: 0; }
+    body { background: black; color: white; text-align: center; font-family: Arial, sans-serif; }
+    h1 { font-size: 4em; margin-top: 20%; }
+    #number { font-size: 8em; margin-top: 20px; }
   </style>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
 </head>
 <body>
   <h1>Now Serving</h1>
-  <p id="number">-</p>
+  <div id="number">-</div>
 
   <script>
-    
-const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-  databaseURL: "https://YOUR_PROJECT_ID.firebaseio.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
-};
+    // Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyCWWnMsge75Q3_MDF9Aj9wo4C5KD6RVGfw",
+      authDomain: "q-matic-b7d77.firebaseapp.com",
+      databaseURL: "https://q-matic-b7d77-default-rtdb.firebaseio.com",
+      projectId: "q-matic-b7d77",
+      storageBucket: "q-matic-b7d77.appspot.com",
+      messagingSenderId: "908187704899",
+      appId: "1:908187704899:web:b8bcf33cda90bafe81bef6"
+    };
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    const numberDisplay = document.getElementById("number");
+    const numDiv = document.getElementById("number");
     let lastUpdateTime = 0;
 
-    db.ref("currentNumber").on("value", (snapshot) => {
-      const data = snapshot.val();
+    db.ref("latest").on("value", snap => {
+      const data = snap.val();
       if (!data) return;
+
       const now = Date.now();
-      if (now - lastUpdateTime < 20000) return; // block updates < 20s
+      if (now - lastUpdateTime < 20000) return; // enforce 20 seconds
 
       lastUpdateTime = now;
-      const number = data.number;
-      numberDisplay.textContent = number;
+      numDiv.textContent = data.number;
 
       // Speak the number twice
-      const utterance = new SpeechSynthesisUtterance(number);
+      let utterance = new SpeechSynthesisUtterance(data.number.toString());
       utterance.lang = "en-US";
-      window.speechSynthesis.speak(utterance);
-      setTimeout(() => window.speechSynthesis.speak(new SpeechSynthesisUtterance(number)), 1500);
+      speechSynthesis.speak(utterance);
+      setTimeout(() => speechSynthesis.speak(utterance), 1500);
     });
   </script>
 </body>
