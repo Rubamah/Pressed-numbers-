@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Now Serving</title>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+  <style>
+    body { background: black; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; flex-direction: column; font-family: sans-serif; }
+    h1 { font-size: 60px; margin: 20px 0; }
+    p { font-size: 120px; margin: 0; }
+  </style>
+</head>
+<body>
+  <h1>Now Serving</h1>
+  <p id="number">-</p>
+
+  <script>
+    
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+  databaseURL: "https://YOUR_PROJECT_ID.firebaseio.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT_ID.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    const numberDisplay = document.getElementById("number");
+    let lastUpdateTime = 0;
+
+    db.ref("currentNumber").on("value", (snapshot) => {
+      const data = snapshot.val();
+      if (!data) return;
+      const now = Date.now();
+      if (now - lastUpdateTime < 20000) return; // block updates < 20s
+
+      lastUpdateTime = now;
+      const number = data.number;
+      numberDisplay.textContent = number;
+
+      // Speak the number twice
+      const utterance = new SpeechSynthesisUtterance(number);
+      utterance.lang = "en-US";
+      window.speechSynthesis.speak(utterance);
+      setTimeout(() => window.speechSynthesis.speak(new SpeechSynthesisUtterance(number)), 1500);
+    });
+  </script>
+</body>
+</html>
